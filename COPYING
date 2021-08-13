@@ -1,0 +1,39 @@
+The Linux Kernel is provided under:
+
+	SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note
+
+Being under the terms of the GNU General Public License version 2 only,
+according with:
+
+	LICENSES/preferred/GPL-2.0
+
+With an explicit syscall exception, as stated at:
+
+	LICENSES/exceptions/Linux-syscall-note
+
+In addition, other licenses may also apply. Please see:
+
+	Documentation/process/license-rules.rst
+
+for more details.
+
+
+graysky2's kernel_compiler_patch is provided under:
+
+	SPDX-License-Identifier: GPL-2.0
+
+Being under the terms of the GNU General Public License version 2,
+according with:
+
+	LICENSES/preferred/GPL-2.0
+
+
+Adam Cooper's GitHub actions included in this repository,
+and all remaining original contributions from Emanuele Ballarin
+and additional contributors are provided under:
+
+	SPDX-License-Identifier: MIT
+
+Being under the terms of the MIT License,
+according with:
+	LICENSES/preferred/MIT
