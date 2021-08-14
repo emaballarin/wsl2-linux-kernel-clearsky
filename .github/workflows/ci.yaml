@@ -1,1 +1,73 @@
+name: ci
 
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - master
+  schedule:
+    - cron: "0 13 * * *"
+
+jobs:
+  check-for-new-ms-kernel:
+    runs-on: ubuntu-20.04
+    outputs:
+      tag_name: ${{ env.MSKERNELTAG }}
+      tag_exists: ${{ steps.check_tag.outputs.exists }}
+
+    steps:
+    - name: Fetch latest release of the Linux Kernel for WSL2 from Microsoft
+      uses: octokit/request-action@v2.x
+      id: get_latest_release
+      with:
+        route: GET /repos/{owner}/{repo}/releases/latest
+        owner: microsoft
+        repo: WSL2-Linux-Kernel
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Get the latest tag of the Linux Kernel for WSL2 from Microsoft
+      run: |
+        echo "MSKERNELTAG=${{ fromJson(steps.get_latest_release.outputs.data).tag_name }}" >> $GITHUB_ENV
+        echo "Latest tag for WSL2 Linux Kernel from Microsoft is ${{ env.MSKERNELTAG }}"
+    - name: Check if tag exists in our repository
+      uses: mukunku/tag-exists-action@v1.0.0
+      id: check_tag
+      with: 
+        tag: ${{ env.MSKERNELTAG }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  patch-and-release:
+    needs: check-for-new-ms-kernel
+    if: ${{ github.event_name != 'schedule' || needs.check-for-new-ms-kernel.outputs.tag_exists != 'true' }}
+    runs-on: ubuntu-20.04
+    env:
+      GRAYSKYPATCH: https://raw.githubusercontent.com/graysky2/kernel_compiler_patch/master/more-uarches-for-kernel-5.8%2B.patch
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Download latest release of the Linux Kernel for WSL2 from Microsoft
+      run: |
+        MSKERNELVERS=`curl -L 'https://github.com/microsoft/WSL2-Linux-Kernel/releases/latest' | grep tar.gz | grep /microsoft/WSL2-Linux-Kernel/archive/refs/tags/linux-msft-wsl- | sed 's!\(.*/microsoft/WSL2-Linux-Kernel/archive/refs/tags/\([^"]*\).*\|.*span.*\)!\2!'`
+        echo Downloading ${MSKERNELVERS}
+        curl -L https://github.com/microsoft/WSL2-Linux-Kernel/archive/refs/tags/${MSKERNELVERS}  -O
+        tar xfv linux-msft-wsl-*.tar.gz
+        rm linux-msft-wsl-*.tar.gz
+    - name: Get graysky2's patchfile
+      run: |
+        curl -L ${GRAYSKYPATCH} -O
+        mv more-uarches-for-kernel-*.patch graysky.patch
+        mv graysky.patch ./WSL2-Linux-Kernel-linux-msft-wsl-*
+    - name: Patch the kernel source
+      run: |
+        cd WSL2-Linux-Kernel-linux-msft-wsl-*
+        patch -p1 -i ./graysky.patch
+        cp ./Microsoft/config-wsl ./Microsoft/config-wsl-graysky
+        sed -i 's/microsoft-standard/microsoft-graysky2/' ./Microsoft/config-wsl-graysky
+        cd ..
