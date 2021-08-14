@@ -48,6 +48,8 @@ jobs:
     env:
       GRAYSKYPATCH: https://raw.githubusercontent.com/graysky2/kernel_compiler_patch/master/more-uarches-for-kernel-5.8%2B.patch
       CLEARREPO: https://github.com/emaballarin/linux-hyperv.git
+      LATESTCUSTOMCONFIG_PATH: https://raw.githubusercontent.com/emaballarin/wsl2-linux-kernel-clearsky/main
+      LATESTCUSTOMCONFIG_NAME: config-wsl-graysky-custom
 
     steps:
     - uses: actions/checkout@v2
@@ -68,6 +70,9 @@ jobs:
     - name: Clone Intel's Clear Linux repository
       run: |
         git clone --depth=1 --recursive --recurse-submodules --shallow-submodules https://github.com/emaballarin/linux-hyperv.git
+    - name: Get the latest customized .config file
+      run: |
+        curl ${LATESTCUSTOMCONFIG_PATH}/${LATESTCUSTOMCONFIG_NAME} -O
     - name: Patch the kernel source
       run: |
         cd WSL2-Linux-Kernel-linux-msft-wsl-*
@@ -75,6 +80,7 @@ jobs:
         patch -p1 -i ./graysky.patch
         mv ./Microsoft/config-wsl ./Microsoft/config-wsl-clearsky
         sed -i 's/microsoft-standard/microsoft-clearsky/' ./Microsoft/config-wsl-clearsky
+        mv ../${LATESTCUSTOMCONFIG_NAME} ./Microsoft/
         rm -f ./graysky.patch
         rm -R -f ../linux-hyperv
         cd ..
