@@ -28,12 +28,13 @@ according with:
 	LICENSES/preferred/GPL-2.0
 
 
-Adam Cooper's GitHub actions included in this repository,
-and all remaining original contributions from Emanuele Ballarin
-and additional contributors are provided under:
+Parts of Adam Cooper's GitHub pipeline for Delugia Code included in
+this repository, and all remaining original contributions from
+Emanuele Ballarin and additional contributors are provided under:
 
 	SPDX-License-Identifier: MIT
 
 Being under the terms of the MIT License,
 according with:
+
 	LICENSES/preferred/MIT
