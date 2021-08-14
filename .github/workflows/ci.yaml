@@ -47,6 +47,7 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       GRAYSKYPATCH: https://raw.githubusercontent.com/graysky2/kernel_compiler_patch/master/more-uarches-for-kernel-5.8%2B.patch
+      CLEARREPO: https://github.com/emaballarin/linux-hyperv.git
 
     steps:
     - uses: actions/checkout@v2
@@ -64,13 +65,18 @@ jobs:
         curl -L ${GRAYSKYPATCH} -O
         mv more-uarches-for-kernel-*.patch graysky.patch
         mv graysky.patch ./WSL2-Linux-Kernel-linux-msft-wsl-*
+    - name: Clone Intel's Clear Linux repository
+      run: |
+        git clone --depth=1 --recursive --recurse-submodules --shallow-submodules https://github.com/emaballarin/linux-hyperv.git
     - name: Patch the kernel source
       run: |
         cd WSL2-Linux-Kernel-linux-msft-wsl-*
+        for i in ../linux-hyperv/*.patch; do patch -p1 < $i; done
         patch -p1 -i ./graysky.patch
         mv ./Microsoft/config-wsl ./Microsoft/config-wsl-graysky
         sed -i 's/microsoft-standard/microsoft-graysky2/' ./Microsoft/config-wsl-graysky
-        rm ./graysky.patch
+        rm -f ./graysky.patch
+        rm -R -f ../linux-hyperv
         cd ..
     - name: Prepare for compression
       run: |
