@@ -3,7 +3,7 @@ name: ci
 on:
   push:
     branches:
-      - main
+      - master
     tags:
       - 'v*'
   pull_request:
@@ -71,3 +71,16 @@ jobs:
         cp ./Microsoft/config-wsl ./Microsoft/config-wsl-graysky
         sed -i 's/microsoft-standard/microsoft-graysky2/' ./Microsoft/config-wsl-graysky
         cd ..
+    - name: Prepare for zip compression
+      run: |
+        echo "FOLDERNAME=$(ls | grep WSL2-Linux-Kernel-linux-msft-wsl-)" >> $GITHUB_ENV
+    - uses: actions/upload-artifact@master
+      with:
+        name: ${{ needs.check-for-new-cascadia.outputs.tag_name }}
+        path: ${{ env.FOLDERNAME }}
+    - name: Compress (tar.gz)
+      run: |
+        tar -czvf "${{ needs.check-for-new-cascadia.outputs.tag_name }}.tar.gz" WSL2-Linux-Kernel-linux-msft-wsl-*
+    - name: Upload artifact(s)
+      run: |
+        echo $(ls -a)
