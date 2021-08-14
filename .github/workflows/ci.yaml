@@ -49,7 +49,7 @@ jobs:
       GRAYSKYPATCH: https://raw.githubusercontent.com/graysky2/kernel_compiler_patch/master/more-uarches-for-kernel-5.8%2B.patch
       CLEARREPO: https://github.com/emaballarin/linux-hyperv.git
       LATESTCUSTOMCONFIG_PATH: https://raw.githubusercontent.com/emaballarin/wsl2-linux-kernel-clearsky/main
-      LATESTCUSTOMCONFIG_NAME: config-wsl-graysky-custom
+      LATESTCUSTOMCONFIG_NAME: config-wsl-clearsky-custom
 
     steps:
     - uses: actions/checkout@v2
