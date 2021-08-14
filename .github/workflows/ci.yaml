@@ -73,8 +73,8 @@ jobs:
         cd WSL2-Linux-Kernel-linux-msft-wsl-*
         for i in ../linux-hyperv/*.patch; do patch -p1 < $i; done
         patch -p1 -i ./graysky.patch
-        mv ./Microsoft/config-wsl ./Microsoft/config-wsl-graysky
-        sed -i 's/microsoft-standard/microsoft-graysky2/' ./Microsoft/config-wsl-graysky
+        mv ./Microsoft/config-wsl ./Microsoft/config-wsl-clearsky
+        sed -i 's/microsoft-standard/microsoft-clearsky/' ./Microsoft/config-wsl-clearsky
         rm -f ./graysky.patch
         rm -R -f ../linux-hyperv
         cd ..
