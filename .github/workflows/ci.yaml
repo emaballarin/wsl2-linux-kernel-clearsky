@@ -68,8 +68,9 @@ jobs:
       run: |
         cd WSL2-Linux-Kernel-linux-msft-wsl-*
         patch -p1 -i ./graysky.patch
-        cp ./Microsoft/config-wsl ./Microsoft/config-wsl-graysky
+        mv ./Microsoft/config-wsl ./Microsoft/config-wsl-graysky
         sed -i 's/microsoft-standard/microsoft-graysky2/' ./Microsoft/config-wsl-graysky
+        rm ./graysky.patch
         cd ..
     - name: Prepare for compression
       run: |
