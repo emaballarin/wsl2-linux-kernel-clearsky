@@ -46,7 +46,7 @@ jobs:
     if: ${{ github.event_name != 'schedule' || needs.check-for-new-ms-kernel.outputs.tag_exists != 'true' }}
     runs-on: ubuntu-20.04
     env:
-      GRAYSKYPATCH: https://raw.githubusercontent.com/graysky2/kernel_compiler_patch/master/more-uarches-for-kernel-5.8-5.14.patch
+      GRAYSKYPATCH: https://raw.githubusercontent.com/graysky2/kernel_compiler_patch/master/more-uarches-for-kernel-5.15-5.16.patch
       CLEARREPO: https://github.com/emaballarin/linux-hyperv.git
       LATESTCUSTOMCONFIG_PATH: https://raw.githubusercontent.com/emaballarin/wsl2-linux-kernel-clearsky/main
       LATESTCUSTOMCONFIG_NAME: config-wsl-clearsky-custom
