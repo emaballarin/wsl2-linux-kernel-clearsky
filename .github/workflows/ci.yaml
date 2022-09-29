@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - 'v*'
+      - "v*"
   pull_request:
     branches:
       - main
@@ -20,26 +20,26 @@ jobs:
       tag_exists: ${{ steps.check_tag.outputs.exists }}
 
     steps:
-    - name: Fetch latest release of the Linux Kernel for WSL2 from Microsoft
-      uses: octokit/request-action@v2.x
-      id: get_latest_release
-      with:
-        route: GET /repos/{owner}/{repo}/releases/latest
-        owner: microsoft
-        repo: WSL2-Linux-Kernel
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Get the latest tag of the Linux Kernel for WSL2 from Microsoft
-      run: |
-        echo "MSKERNELTAG=${{ fromJson(steps.get_latest_release.outputs.data).tag_name }}" >> $GITHUB_ENV
-        echo "Latest tag for WSL2 Linux Kernel from Microsoft is ${{ env.MSKERNELTAG }}"
-    - name: Check if tag exists in our repository
-      uses: mukunku/tag-exists-action@v1.0.0
-      id: check_tag
-      with: 
-        tag: ${{ env.MSKERNELTAG }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Fetch latest release of the Linux Kernel for WSL2 from Microsoft
+        uses: octokit/request-action@v2.x
+        id: get_latest_release
+        with:
+          route: GET /repos/{owner}/{repo}/releases/latest
+          owner: microsoft
+          repo: WSL2-Linux-Kernel
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get the latest tag of the Linux Kernel for WSL2 from Microsoft
+        run: |
+          echo "MSKERNELTAG=${{ fromJson(steps.get_latest_release.outputs.data).tag_name }}" >> $GITHUB_ENV
+          echo "Latest tag for WSL2 Linux Kernel from Microsoft is ${{ env.MSKERNELTAG }}"
+      - name: Check if tag exists in our repository
+        uses: mukunku/tag-exists-action@v1.0.0
+        id: check_tag
+        with:
+          tag: ${{ env.MSKERNELTAG }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   patch-and-release:
     needs: check-for-new-ms-kernel
@@ -52,84 +52,84 @@ jobs:
       LATESTCUSTOMCONFIG_NAME: config-wsl-clearsky-custom
 
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: Download latest release of the Linux Kernel for WSL2 from Microsoft
-      run: |
-        MSKERNELVERS=`curl -L 'https://github.com/microsoft/WSL2-Linux-Kernel/releases/latest' | grep tar.gz | grep /microsoft/WSL2-Linux-Kernel/archive/refs/tags/linux-msft-wsl- | sed 's!\(.*/microsoft/WSL2-Linux-Kernel/archive/refs/tags/\([^"]*\).*\|.*span.*\)!\2!'`
-        echo Downloading ${MSKERNELVERS}
-        curl -L https://github.com/microsoft/WSL2-Linux-Kernel/archive/refs/tags/${MSKERNELVERS}  -O
-        tar xfv linux-msft-wsl-*.tar.gz
-        rm linux-msft-wsl-*.tar.gz
-    - name: Get graysky2's patchfile
-      run: |
-        curl -L ${GRAYSKYPATCH} -O
-        mv more-uarches-for-kernel-*.patch graysky.patch
-        mv graysky.patch ./WSL2-Linux-Kernel-linux-msft-wsl-*
-    - name: Clone Intel's Clear Linux repository
-      run: |
-        git clone --depth=1 --recursive --recurse-submodules --shallow-submodules https://github.com/emaballarin/linux-hyperv.git
-    - name: Get the latest customized .config file
-      run: |
-        curl ${LATESTCUSTOMCONFIG_PATH}/${LATESTCUSTOMCONFIG_NAME} -O
-    - name: Patch the kernel source
-      run: |
-        cd WSL2-Linux-Kernel-linux-msft-wsl-*
-        for i in ../linux-hyperv/*.patch; do patch -p1 < $i; done
-        patch -p1 -i ./graysky.patch
-        mv ./Microsoft/config-wsl ./Microsoft/config-wsl-clearsky
-        sed -i 's/microsoft-standard/microsoft-clearsky/' ./Microsoft/config-wsl-clearsky
-        mv ../${LATESTCUSTOMCONFIG_NAME} ./Microsoft/
-        rm -f ./graysky.patch
-        rm -R -f ../linux-hyperv
-        cd ..
-    - name: Prepare for compression
-      run: |
-        echo "FOLDERNAME=$(ls | grep WSL2-Linux-Kernel-linux-msft-wsl-)" >> $GITHUB_ENV
-    - name: Compress (tar.gz)
-      run: |
-        tar -czvf "${{ needs.check-for-new-ms-kernel.outputs.tag_name }}.tar.gz" ${{ env.FOLDERNAME }}
-    - name: 'Upload Artifact'
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ needs.check-for-new-ms-kernel.outputs.tag_name }}
-        path: ${{ needs.check-for-new-ms-kernel.outputs.tag_name }}.tar.gz
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Download latest release of the Linux Kernel for WSL2 from Microsoft
+        run: |
+          MSKERNELVERS=`curl -L 'https://github.com/microsoft/WSL2-Linux-Kernel/releases/latest' | grep tar.gz | grep /microsoft/WSL2-Linux-Kernel/archive/refs/tags/rolling-lts/wsl/ | sed 's!\(.*/microsoft/WSL2-Linux-Kernel/archive/refs/tags/\([^"]*\).*\|.*span.*\)!\2!'`
+          echo Downloading ${MSKERNELVERS}
+          curl -L https://github.com/microsoft/WSL2-Linux-Kernel/archive/refs/tags/${MSKERNELVERS}  -O
+          tar xfv 5.*.tar.gz
+          rm 5.*.tar.gz
+      - name: Get graysky2's patchfile
+        run: |
+          curl -L ${GRAYSKYPATCH} -O
+          mv more-uarches-for-kernel-*.patch graysky.patch
+          mv graysky.patch ./WSL2-Linux-Kernel-rolling-lts-wsl-*
+      - name: Clone Intel's Clear Linux repository
+        run: |
+          git clone --depth=1 --recursive --recurse-submodules --shallow-submodules https://github.com/emaballarin/linux-hyperv.git
+      - name: Get the latest customized .config file
+        run: |
+          curl ${LATESTCUSTOMCONFIG_PATH}/${LATESTCUSTOMCONFIG_NAME} -O
+      - name: Patch the kernel source
+        run: |
+          cd WSL2-Linux-Kernel-rolling-lts-wsl-*
+          for i in ../linux-hyperv/*.patch; do patch -p1 < $i; done
+          patch -p1 -i ./graysky.patch
+          mv ./Microsoft/config-wsl ./Microsoft/config-wsl-clearsky
+          sed -i 's/microsoft-standard/microsoft-clearsky/' ./Microsoft/config-wsl-clearsky
+          mv ../${LATESTCUSTOMCONFIG_NAME} ./Microsoft/
+          rm -f ./graysky.patch
+          rm -R -f ../linux-hyperv
+          cd ..
+      - name: Prepare for compression
+        run: |
+          echo "FOLDERNAME=$(ls | grep WSL2-Linux-Kernel-rolling-lts-wsl-)" >> $GITHUB_ENV
+      - name: Compress (tar.gz)
+        run: |
+          tar -czvf "${{ needs.check-for-new-ms-kernel.outputs.tag_name }}.tar.gz" ${{ env.FOLDERNAME }}
+      - name: "Upload Artifact"
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ needs.check-for-new-ms-kernel.outputs.tag_name }}
+          path: ${{ needs.check-for-new-ms-kernel.outputs.tag_name }}.tar.gz
 
-    #Actual release
-    - name: Create tag
-      if: ${{ github.event_name != 'pull_request' && !startsWith(github.ref, 'refs/tags/') && needs.check-for-new-ms-kernel.outputs.tag_exists != 'true' }}
-      uses: actions/github-script@v3
-      with:
-        github-token: ${{ github.token }}
-        script: |
-          const tagName = "${{ needs.check-for-new-ms-kernel.outputs.tag_name }}";
+      #Actual release
+      - name: Create tag
+        if: ${{ github.event_name != 'pull_request' && !startsWith(github.ref, 'refs/tags/') && needs.check-for-new-ms-kernel.outputs.tag_exists != 'true' }}
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const tagName = "${{ needs.check-for-new-ms-kernel.outputs.tag_name }}";
 
-          const createdTag = await github.git.createTag({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            tag: tagName,
-            message: `Bump Linux kernel from Microsoft for WSL2 to version ${tagName}`,
-            object: context.sha,
-            type: "commit"
-          })
-
-          github.git.createRef({
+            const createdTag = await github.git.createTag({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: `refs/tags/${tagName}`,
-              sha: createdTag.data.sha
-          })
-    - name: Get tag name
-      id: get_tag_name
-      if: ${{ startsWith(github.ref, 'refs/tags/') }}
-      uses: battila7/get-version-action@v2
-    - name: Release
-      uses: softprops/action-gh-release@v1
-      if: ${{ github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/') || needs.check-for-new-ms-kernel.outputs.tag_exists != 'true') }}
-      with:
-        tag_name: ${{ startsWith(github.ref, 'refs/tags/') && steps.get_tag_name.outputs.version || needs.check-for-new-ms-kernel.outputs.tag_name }}
-        files: |
-          ${{ needs.check-for-new-ms-kernel.outputs.tag_name }}.tar.gz
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              tag: tagName,
+              message: `Bump Linux kernel from Microsoft for WSL2 to version ${tagName}`,
+              object: context.sha,
+              type: "commit"
+            })
+
+            github.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `refs/tags/${tagName}`,
+                sha: createdTag.data.sha
+            })
+      - name: Get tag name
+        id: get_tag_name
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        uses: battila7/get-version-action@v2
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: ${{ github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/') || needs.check-for-new-ms-kernel.outputs.tag_exists != 'true') }}
+        with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && steps.get_tag_name.outputs.version || needs.check-for-new-ms-kernel.outputs.tag_name }}
+          files: |
+            ${{ needs.check-for-new-ms-kernel.outputs.tag_name }}.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

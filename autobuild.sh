@@ -7,10 +7,10 @@ PWD_CALLDIR="$(pwd)"
 eval wget $(curl -s https://api.github.com/repos/emaballarin/wsl2-linux-kernel-clearsky/releases/latest  | grep browser_download_url | cut -d : -f 2,3)
 
 # Unpack it
-tar xfv ./linux-msft-wsl-*.tar.gz
+tar xfv ./5.*.tar.gz
 
 # Enter extracted folder
-cd ./WSL2-Linux-Kernel-linux-msft-wsl-*
+cd ./WSL2-Linux-Kernel-rolling-lts-wsl-*
 
 # Apply custom configuration
 cp ./Microsoft/config-wsl-clearsky-custom ./.config
@@ -44,8 +44,8 @@ fi
 
 # Cleanup
 cd "$PWD_CALLDIR"
-rm -f ./linux-msft-wsl-*.tar.gz
-rm -R -f ./WSL2-Linux-Kernel-linux-msft-wsl-*
+rm -f ./5.*.tar.gz
+rm -R -f ./WSL2-Linux-Kernel-rolling-lts-wsl-*
 
 # Final greeting
 echo " "
