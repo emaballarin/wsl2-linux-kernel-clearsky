@@ -58,6 +58,7 @@ jobs:
       - name: Download latest release of the Linux Kernel for WSL2 from Microsoft
         run: |
           MSKERNELVERS=`curl -L 'https://github.com/microsoft/WSL2-Linux-Kernel/releases/latest' | grep "https://github.com/microsoft/WSL2-Linux-Kernel/releases/expanded_assets/rolling-lts/wsl/" | sed 's!\(.*microsoft/WSL2-Linux-Kernel/releases/expanded_assets/rolling-lts/wsl/\([^"]*\).*\|.*span.*\)!\2!'`
+          echo "MSKERNELVERS=${MSKERNELVERS}" >> $GITHUB_ENV
           echo Downloading ${MSKERNELVERS}
           curl -L https://github.com/microsoft/WSL2-Linux-Kernel/archive/refs/tags/rolling-lts/wsl/${MSKERNELVERS}.tar.gz  -O
           tar xfv 5.*.tar.gz
@@ -87,16 +88,14 @@ jobs:
       - name: Prepare for compression
         run: |
           echo "FOLDERNAME=$(ls | grep WSL2-Linux-Kernel-rolling-lts-wsl-)" >> $GITHUB_ENV
-          TARNAME="$(${{ needs.check-for-new-ms-kernel.outputs.tag_name }} | sed 's!\(.*rolling-lts/wsl/\([^"]*\).*\|.*span.*\)!\2!')"
-          echo "TARNAME=$TARNAME" >> $GITHUB_ENV
       - name: Compress (tar.gz)
         run: |
-          tar -czvf ${{ env.TARNAME }}.tar.gz ${{ env.FOLDERNAME }}
+          tar -czvf ${{ env.MSKERNELVERS }}.tar.gz ${{ env.FOLDERNAME }}
       - name: "Upload Artifact"
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.TARNAME }}
-          path: ${{ env.TARNAME }}.tar.gz
+          name: ${{ env.MSKERNELVERS }}
+          path: ${{ env.MSKERNELVERS }}.tar.gz
 
       #Actual release
       - name: Create tag
