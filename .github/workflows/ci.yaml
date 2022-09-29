@@ -91,11 +91,12 @@ jobs:
       - name: Compress (tar.gz)
         run: |
           tar -czvf ${{ env.MSKERNELVERS }}.tar.gz ${{ env.FOLDERNAME }}
+          mv "${{ env.MSKERNELVERS }}.tar.gz" "linux-msft-wsl-${{ env.MSKERNELVERS }}.tar.gz"
       - name: "Upload Artifact"
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.MSKERNELVERS }}
-          path: ${{ env.MSKERNELVERS }}.tar.gz
+          name: linux-msft-wsl-${{ env.MSKERNELVERS }}
+          path: linux-msft-wsl-${{ env.MSKERNELVERS }}.tar.gz
 
       #Actual release
       - name: Create tag
@@ -131,6 +132,6 @@ jobs:
         with:
           tag_name: ${{ startsWith(github.ref, 'refs/tags/') && steps.get_tag_name.outputs.version || needs.check-for-new-ms-kernel.outputs.tag_name }}
           files: |
-            ${{ needs.check-for-new-ms-kernel.outputs.tag_name }}.tar.gz
+            linux-msft-wsl-${{ env.MSKERNELVERS }}.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
