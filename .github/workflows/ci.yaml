@@ -57,7 +57,7 @@ jobs:
           fetch-depth: 0
       - name: Download latest release of the Linux Kernel for WSL2 from Microsoft
         run: |
-          MSKERNELVERS=`curl -L 'https://github.com/microsoft/WSL2-Linux-Kernel/releases/latest' | grep tar.gz | grep /microsoft/WSL2-Linux-Kernel/archive/refs/tags/rolling-lts/wsl/ | sed 's!\(.*/microsoft/WSL2-Linux-Kernel/archive/refs/tags/\([^"]*\).*\|.*span.*\)!\2!'`
+          MSKERNELVERS=`curl -L 'https://github.com/microsoft/WSL2-Linux-Kernel/releases/latest' | grep "https://github.com/microsoft/WSL2-Linux-Kernel/releases/expanded_assets/rolling-lts/wsl/" | sed 's!\(.*microsoft/WSL2-Linux-Kernel/releases/expanded_assets/rolling-lts/wsl/\([^"]*\).*\|.*span.*\)!\2!'`
           echo Downloading ${MSKERNELVERS}
           curl -L https://github.com/microsoft/WSL2-Linux-Kernel/archive/refs/tags/${MSKERNELVERS}  -O
           tar xfv 5.*.tar.gz
