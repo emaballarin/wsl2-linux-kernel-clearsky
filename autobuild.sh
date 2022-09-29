@@ -4,10 +4,10 @@
 PWD_CALLDIR="$(pwd)"
 
 # Download latest published release tarball
-eval wget $(curl -s https://api.github.com/repos/emaballarin/wsl2-linux-kernel-clearsky/releases/latest  | grep browser_download_url | cut -d : -f 2,3)
+eval wget $(curl -s https://api.github.com/repos/emaballarin/wsl2-linux-kernel-clearsky/releases/latest  | grep browser_download_url | cut -d : -f 2,3 | tr -d '"')
 
 # Unpack it
-tar xfv ./5.*.tar.gz
+tar xfv ./linux-msft-wsl-*.tar.gz
 
 # Enter extracted folder
 cd ./WSL2-Linux-Kernel-rolling-lts-wsl-*
@@ -44,7 +44,7 @@ fi
 
 # Cleanup
 cd "$PWD_CALLDIR"
-rm -f ./5.*.tar.gz
+rm -f ./linux-msft-wsl-*.tar.gz
 rm -R -f ./WSL2-Linux-Kernel-rolling-lts-wsl-*
 
 # Final greeting
