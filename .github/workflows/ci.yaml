@@ -59,7 +59,7 @@ jobs:
         run: |
           MSKERNELVERS=`curl -L 'https://github.com/microsoft/WSL2-Linux-Kernel/releases/latest' | grep "https://github.com/microsoft/WSL2-Linux-Kernel/releases/expanded_assets/rolling-lts/wsl/" | sed 's!\(.*microsoft/WSL2-Linux-Kernel/releases/expanded_assets/rolling-lts/wsl/\([^"]*\).*\|.*span.*\)!\2!'`
           echo Downloading ${MSKERNELVERS}
-          curl -L https://github.com/microsoft/WSL2-Linux-Kernel/archive/refs/tags/${MSKERNELVERS}  -O
+          curl -L https://github.com/microsoft/WSL2-Linux-Kernel/archive/refs/tags/rolling-lts/wsl/${MSKERNELVERS}.tar.gz  -O
           tar xfv 5.*.tar.gz
           rm 5.*.tar.gz
       - name: Get graysky2's patchfile
