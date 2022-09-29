@@ -87,15 +87,15 @@ jobs:
       - name: Prepare for compression
         run: |
           echo "FOLDERNAME=$(ls | grep WSL2-Linux-Kernel-rolling-lts-wsl-)" >> $GITHUB_ENV
+          echo "TARNAME=$(${{ needs.check-for-new-ms-kernel.outputs.tag_name }} | sed 's!\(.*rolling-lts/wsl/\([^"]*\).*\|.*span.*\)!\2!')" >> $GITHUB_ENV
       - name: Compress (tar.gz)
         run: |
-          TARNAME="$(${{ needs.check-for-new-ms-kernel.outputs.tag_name }}.tar.gz | sed 's!\(.*rolling-lts/wsl/\([^"]*\).*\|.*span.*\)!\2!')"
-          tar -czvf "$TARNAME" ${{ env.FOLDERNAME }}
+          tar -czvf ${{ env.TARNAME }}.tar.gz ${{ env.FOLDERNAME }}
       - name: "Upload Artifact"
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ TARNAME }}
-          path: ${{ TARNAME }}.tar.gz
+          name: ${{ env.TARNAME }}
+          path: ${{ env.TARNAME }}.tar.gz
 
       #Actual release
       - name: Create tag
