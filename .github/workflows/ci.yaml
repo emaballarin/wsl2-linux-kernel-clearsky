@@ -10,11 +10,11 @@ on:
     branches:
       - main
   schedule:
-    - cron: "0 13 * * *"
+    - cron: "0 12 * * *"
 
 jobs:
   check-for-new-ms-kernel:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     outputs:
       tag_name: ${{ env.MSKERNELTAG }}
       tag_exists: ${{ steps.check_tag.outputs.exists }}
@@ -44,7 +44,7 @@ jobs:
   patch-and-release:
     needs: check-for-new-ms-kernel
     if: ${{ github.event_name != 'schedule' || needs.check-for-new-ms-kernel.outputs.tag_exists != 'true' }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       GRAYSKYPATCH: https://raw.githubusercontent.com/graysky2/kernel_compiler_patch/master/more-uarches-for-kernel-5.15-5.16.patch
       CLEARREPO: https://github.com/emaballarin/linux-hyperv.git
@@ -52,7 +52,7 @@ jobs:
       LATESTCUSTOMCONFIG_NAME: config-wsl-clearsky-custom
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Download latest release of the Linux Kernel for WSL2 from Microsoft
@@ -93,7 +93,7 @@ jobs:
           tar -czvf ${{ env.MSKERNELVERS }}.tar.gz ${{ env.FOLDERNAME }}
           mv "${{ env.MSKERNELVERS }}.tar.gz" "linux-msft-wsl-${{ env.MSKERNELVERS }}.tar.gz"
       - name: "Upload Artifact"
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: linux-msft-wsl-${{ env.MSKERNELVERS }}
           path: linux-msft-wsl-${{ env.MSKERNELVERS }}.tar.gz
@@ -101,7 +101,7 @@ jobs:
       #Actual release
       - name: Create tag
         if: ${{ github.event_name != 'pull_request' && !startsWith(github.ref, 'refs/tags/') && needs.check-for-new-ms-kernel.outputs.tag_exists != 'true' }}
-        uses: actions/github-script@v3
+        uses: actions/github-script@v6
         with:
           github-token: ${{ github.token }}
           script: |
