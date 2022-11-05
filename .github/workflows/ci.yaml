@@ -57,12 +57,12 @@ jobs:
           fetch-depth: 0
       - name: Download latest release of the Linux Kernel for WSL2 from Microsoft
         run: |
-          MSKERNELVERS=`curl -L 'https://github.com/microsoft/WSL2-Linux-Kernel/releases/latest' | grep "https://github.com/microsoft/WSL2-Linux-Kernel/releases/expanded_assets/rolling-lts/wsl/" | sed 's!\(.*microsoft/WSL2-Linux-Kernel/releases/expanded_assets/rolling-lts/wsl/\([^"]*\).*\|.*span.*\)!\2!'`
+          MSKERNELVERS=`curl -L 'https://github.com/microsoft/WSL2-Linux-Kernel/releases/latest' | grep "https://github.com/microsoft/WSL2-Linux-Kernel/releases/expanded_assets/linux-msft-wsl-" | sed 's!\(.*microsoft/WSL2-Linux-Kernel/releases/expanded_assets/linux-msft-wsl-\([^"]*\).*\|.*span.*\)!\2!'`
           echo "MSKERNELVERS=${MSKERNELVERS}" >> $GITHUB_ENV
           echo Downloading ${MSKERNELVERS}
-          curl -L https://github.com/microsoft/WSL2-Linux-Kernel/archive/refs/tags/rolling-lts/wsl/${MSKERNELVERS}.tar.gz  -O
-          tar xfv 5.*.tar.gz
-          rm 5.*.tar.gz
+          curl -L https://github.com/microsoft/WSL2-Linux-Kernel/archive/refs/tags/linux-msft-wsl-${MSKERNELVERS}.tar.gz  -O
+          tar xfv *5.*.tar.gz
+          rm *5.*.tar.gz
       - name: Get graysky2's patchfile
         run: |
           curl -L ${GRAYSKYPATCH} -O
@@ -76,7 +76,7 @@ jobs:
           curl ${LATESTCUSTOMCONFIG_PATH}/${LATESTCUSTOMCONFIG_NAME} -O
       - name: Patch the kernel source
         run: |
-          cd WSL2-Linux-Kernel-rolling-lts-wsl-*
+          cd WSL2-Linux-Kernel-linux-msft-wsl-*
           for i in ../linux-hyperv/*.patch; do patch -p1 < $i; done
           patch -p1 -i ./graysky.patch
           mv ./Microsoft/config-wsl ./Microsoft/config-wsl-clearsky
@@ -87,7 +87,7 @@ jobs:
           cd ..
       - name: Prepare for compression
         run: |
-          echo "FOLDERNAME=$(ls | grep WSL2-Linux-Kernel-rolling-lts-wsl-)" >> $GITHUB_ENV
+          echo "FOLDERNAME=$(ls | grep WSL2-Linux-Kernel-linux-msft-wsl-)" >> $GITHUB_ENV
       - name: Compress (tar.gz)
         run: |
           tar -czvf ${{ env.MSKERNELVERS }}.tar.gz ${{ env.FOLDERNAME }}
