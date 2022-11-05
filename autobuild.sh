@@ -10,7 +10,7 @@ eval wget $(curl -s https://api.github.com/repos/emaballarin/wsl2-linux-kernel-c
 tar xfv ./linux-msft-wsl-*.tar.gz
 
 # Enter extracted folder
-cd ./WSL2-Linux-Kernel-rolling-lts-wsl-*
+cd ./WSL2-Linux-Kernel-linux-msft-wsl-*
 
 # Apply custom configuration
 cp ./Microsoft/config-wsl-clearsky-custom ./.config
@@ -45,7 +45,7 @@ fi
 # Cleanup
 cd "$PWD_CALLDIR"
 rm -f ./linux-msft-wsl-*.tar.gz
-rm -R -f ./WSL2-Linux-Kernel-rolling-lts-wsl-*
+rm -R -f ./WSL2-Linux-Kernel-linux-msft-wsl-*
 
 # Final greeting
 echo " "
