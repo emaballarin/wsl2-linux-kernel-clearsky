@@ -101,7 +101,7 @@ jobs:
       #Actual release
       - name: Create tag
         if: ${{ github.event_name != 'pull_request' && !startsWith(github.ref, 'refs/tags/') && needs.check-for-new-ms-kernel.outputs.tag_exists != 'true' }}
-        uses: actions/github-script@v6
+        uses: actions/github-script@v3
         with:
           github-token: ${{ github.token }}
           script: |
