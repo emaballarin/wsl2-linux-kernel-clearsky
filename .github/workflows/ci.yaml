@@ -85,19 +85,32 @@ jobs:
           rm -f ./graysky.patch
           rm -R -f ../linux-hyperv
           cd ..
+          
+      - name: Install dependencies
+        run: |
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+          sudo apt-get update
+          sudo apt-get install -y dwarves libelf-dev axel flex bison ncurses-dev texinfo gcc gperf patch libtool automake g++ libncurses5-dev gawk subversion expat libexpat1-dev python-all-dev binutils-dev bc libcap-dev autoconf libgmp-dev build-essential pkg-config libmpc-dev libmpfr-dev autopoint gettext txt2man liblzma-dev libssl-dev libz-dev mercurial wget tar gcc-11 g++-11 cmake ninja-build zstd lz4 liblz4-tool liblz4-dev lzma --fix-broken --fix-missing
+      - name: Print GCC Version
+        run: gcc-11 --version
+
+      - name: Compile Kernel
+        run: |
+          pwd
+          cd WSL2-Linux-Kernel-rolling-lts-wsl-*
+          make -j$(nproc --all) CC=gcc-11 CXX=g++-11 KCONFIG_CONFIG=Microsoft/config-wsl-clearsky-custom
       - name: Prepare for compression
         run: |
-          echo "FOLDERNAME=$(ls | grep WSL2-Linux-Kernel-linux-msft-wsl-)" >> $GITHUB_ENV
+            echo "FOLDERNAME=$(ls | grep WSL2-Linux-Kernel-rolling-lts-wsl-)" >> $GITHUB_ENV
       - name: Compress (tar.gz)
         run: |
-          tar -czvf ${{ env.MSKERNELVERS }}.tar.gz ${{ env.FOLDERNAME }}
-          mv "${{ env.MSKERNELVERS }}.tar.gz" "linux-msft-wsl-${{ env.MSKERNELVERS }}.tar.gz"
+            tar -czvf ${{ env.MSKERNELVERS }}.tar.gz ${{ env.FOLDERNAME }}
+            mv "${{ env.MSKERNELVERS }}.tar.gz" "linux-msft-wsl-${{ env.MSKERNELVERS }}.tar.gz"
       - name: "Upload Artifact"
         uses: actions/upload-artifact@v3
         with:
-          name: linux-msft-wsl-${{ env.MSKERNELVERS }}
-          path: linux-msft-wsl-${{ env.MSKERNELVERS }}.tar.gz
-
+            name: linux-msft-wsl-${{ env.MSKERNELVERS }}
+            path: linux-msft-wsl-${{ env.MSKERNELVERS }}.tar.gz
       #Actual release
       - name: Create tag
         if: ${{ github.event_name != 'pull_request' && !startsWith(github.ref, 'refs/tags/') && needs.check-for-new-ms-kernel.outputs.tag_exists != 'true' }}
@@ -133,5 +146,6 @@ jobs:
           tag_name: ${{ startsWith(github.ref, 'refs/tags/') && steps.get_tag_name.outputs.version || needs.check-for-new-ms-kernel.outputs.tag_name }}
           files: |
             linux-msft-wsl-${{ env.MSKERNELVERS }}.tar.gz
+            ${{ env.FOLDERNAME }}/arch/x86/boot/bzImage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
